@@ -9,7 +9,9 @@ matplotlib.rcParams['font.family'] = ['STKaiTi']
 matplotlib.rcParams['axes.unicode_minus'] = False
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import datasets, layers, optimizers
+# from tensorflow.keras import datasets, layers, optimizers
+# from tensorflow_core.python.keras.api._v2.keras import optimizers
+from tensorflow_core.python.keras import datasets
 import os
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
