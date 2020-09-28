@@ -38,13 +38,47 @@ def gather():
     res = tf.stack([x[1, 1], x[2, 2], x[3, 3]], axis=0)
 
 
+def gather_nd():
+    """
+    指定每次采样点的多维坐标来实现采样多个点
+    """
+    # 假设共有 4 个班级，每个班级 35 个学生，8 门科目，保存成绩册的张量 shape 为[4,35,8]
+    x = tf.random.uniform([4, 35, 8], maxval=100, dtype=tf.int32)  # 成绩册张量
+    # 抽查第 2 个班级的第 2 个同学的所有科目，第 3 个班级的 第 3 个同学的所有科目，
+    # 第 4 个班级的第 4 个同学的所有科目。那么这 3 个采样点的索引 坐标可以记为：
+    # [1,1]、[2,2]、[3,3]，我们将这个采样方案合并为一个 List 参数，即 [[1,1],[2,2],[3,3]]，
+    # 通过 tf.gather_nd 函数即可，实现如下：
+    res = tf.gather_nd(x, [[1, 1], [2, 2], [3, 3]])
+    print(res)
+
+    # 根据多维度坐标收集数据
+    res = tf.gather_nd(x, [[1, 1, 2], [2, 2, 3], [3, 3, 4]])
+    print(res)
 
 
+def boolean_mask():
+    """
+    通过掩码（Mask）的方式进行采样
+    """
+    # 假设共有 4 个班级，每个班级 35 个学生，8 门科目，保存成绩册的张量 shape 为[4,35,8]
+    x = tf.random.uniform([4, 35, 8], maxval=100, dtype=tf.int32)  # 成绩册张量
+    # 根据掩码方式采样班级，给出掩码和维度索引
+    res = tf.boolean_mask(x, mask=[True, False, False, True], axis=0)
+    print(res)
+
+    # 采样第1 4 5 8门科目
+    res = tf.boolean_mask(x, mask=[True, False, False, True, True, False, False, True], axis=2)
+    print(res)
+
+    # 多维掩码采样
+    # tf.boolean_mask(x, [[True, True, False], [False, True, True]])
 
 
 def main():
-    gather() # 现根据索引号收集数据
-    gather_nd() # 指定每次采样点的多维坐标来实现采样多个点
+    # gather() # 现根据索引号收集数据
+    # gather_nd() # 指定每次采样点的多维坐标来实现采样多个点
+    # boolean_mask() # 通过掩码（Mask）的方式进行采样
+    where() #
 
 
 if __name__ == '__main__':
