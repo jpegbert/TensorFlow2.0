@@ -1,6 +1,6 @@
 # https://mp.weixin.qq.com/s/BJ73i8ukJ2YwygGPUUPIAg
 
-from __future__ import absolute_import,division,print_function
+from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
 import numpy as np
