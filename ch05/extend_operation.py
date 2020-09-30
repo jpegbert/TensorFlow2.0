@@ -74,11 +74,84 @@ def boolean_mask():
     # tf.boolean_mask(x, [[True, True, False], [False, True, True]])
 
 
+def where():
+    a = tf.ones([3, 3]) # 构造全1矩阵
+    b = tf.zeros([3, 3]) # 构造全0矩阵
+
+    # 构建采样条件
+    cond = tf.constant([[True, False, False], [False, True, False], [True, True, False]])
+    res = tf.where(cond, a, b) # 根据条件从a，b中采样, 返回的张量中为 1 的位置全部来自张量 a，返回的张量中为 0 的位置来自张量 b
+
+    res = tf.where(cond)  # 获取 cond 中为 True 的元素索引
+
+    x = tf.random.normal([3, 3])  # 构造 a
+    mask = x > 0  # 比较操作，等同于 tf.math.greater()
+    # 通过tf.where提取此掩码处True元素的索引坐标：
+    indices = tf.where(mask)  # 提取所有大于 0 的元素索引
+    # 拿到索引后，通过tf.gather_nd即可恢复出所有正数的元素
+    res = tf.gather_nd(x, indices)  # 提取正数的元素值
+    # 当我们得到掩码mask之后，也可以直接通过tf.boolean_mask获取所有正数的元素向量:
+    res = tf.boolean_mask(x, mask)  # 通过掩码提取正数的元素值
+
+
+def scatter_nd():
+    # 构造需要刷新数据的位置参数，即4 3 1 和7号位置
+    indices = tf.constant([[4], [3], [1], [7]])
+    # 构造需要写入的数据，4号位置写4.4,3号位置写3.3，以此类推
+    updates = tf.constant([4.4, 3.3, 1.1, 7.7])
+    # 在长度为8的全0向量上根据indices写入updates数据
+    res = tf.scatter_nd(indices, updates, [8])
+
+    # 构造两个写入位置
+    indices = tf.constant([[1], [3]])
+    updates = tf.constant([ # 构造写入数据，即2个矩阵
+        [[5, 5, 5, 5], [6, 0, 6, 6], [7, 7, 7, 7], [8, 8, 8, 8]],
+        [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3], [4, 4, 4, 4]]
+    ])
+    # 在shape为[4, 4, 4]的白板上根据indices写入updates
+    res = tf.scatter_nd(indices, updates, [4, 4, 4])
+
+
+def sinc(x, y):
+    z = tf.sqrt(x ** 2 + y ** 2)
+    z = tf.sin(z) / z  # sinc 函数实现
+    return z
+
+
+def meshgrid():
+    points = [] # 保存所有点的坐标列表
+    for x in range(-8, 8, 100): # 循环生成x坐标，100个采样点
+        for y in range(-8, 8, 100): # 循环生成y坐标，100个采样点
+            # 计算每个点(x,y)处的 sinc 函数值
+            z = tf.sqrt(x ** 2 + y ** 2)
+            z = tf.sin(z) / z  # sinc 函数实现
+            points.append([x, y, z])  # 保存采样点
+    # 上面这种方式效率低，采用tf.meshgrid
+    x = tf.linspace(-8., 8, 100)  # 设置 x 轴的采样点
+    y = tf.linspace(-8., 8, 100)  # 设置 y 轴的采样点
+    x, y = tf.meshgrid(x, y)  # 生成网格点，并内部拆分后返回
+    print(x.shape, y.shape) # 打印拆分后的所有点的 x,y 坐标张量 shape
+    z = tf.sqrt(x ** 2 + y ** 2)
+    z = tf.sin(z) / z  # sinc 函数实现
+    import matplotlib
+    from matplotlib import pyplot as plt
+    # 导入 3D 坐标轴支持
+    from mpl_toolkits.mplot3d import Axes3D
+
+    fig = plt.figure()
+    ax = Axes3D(fig)  # 设置 3D 坐标轴
+    # 根据网格点绘制 sinc 函数 3D 曲面
+    ax.contour3D(x.numpy(), y.numpy(), z.numpy(), 50)
+    plt.show()
+
+
 def main():
     # gather() # 现根据索引号收集数据
     # gather_nd() # 指定每次采样点的多维坐标来实现采样多个点
     # boolean_mask() # 通过掩码（Mask）的方式进行采样
-    where() #
+    # where() # 通过 tf.where(cond, a, b)操作可以根据 cond 条件的真假从参数𝑨或𝑩中读取数据
+    # scatter_nd() #
+    meshgrid()
 
 
 if __name__ == '__main__':
