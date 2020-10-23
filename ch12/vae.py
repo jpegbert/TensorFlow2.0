@@ -107,18 +107,20 @@ for epoch in range(1000):
         if step % 100 == 0:
             print(epoch, step, 'kl div:', float(kl_div), 'rec loss:', float(rec_loss))
 
-    # evaluation
+    # 测试生成效果，从正态分布随机采样 z
     z = tf.random.normal((batchsz, z_dim))
-    logits = model.decoder(z)
-    x_hat = tf.sigmoid(logits)
+    logits = model.decoder(z) # 仅仅通过解码器生成图片
+    x_hat = tf.sigmoid(logits) # 转换为像素范围
     x_hat = tf.reshape(x_hat, [-1, 28, 28]).numpy() * 255.
     x_hat = x_hat.astype(np.uint8)
-    save_images(x_hat, 'vae_images/sampled_epoch%d.png' % epoch)
+    save_images(x_hat, 'vae_images/sampled_epoch%d.png' % epoch) # 保存图片
 
+    # 重建图片，从测试集采样图片
     x = next(iter(test_db))
     x = tf.reshape(x, [-1, 784])
-    x_hat_logits, _, _ = model(x)
-    x_hat = tf.sigmoid(x_hat_logits)
+    x_hat_logits, _, _ = model(x) # 打平并送入自编码器
+    x_hat = tf.sigmoid(x_hat_logits) # 将输出转换为像素值
+    # 恢复为28 * 28，[b, 784] => [b, 28, 28]
     x_hat = tf.reshape(x_hat, [-1, 28, 28]).numpy() * 255.
     x_hat = x_hat.astype(np.uint8)
     save_images(x_hat, 'vae_images/rec_epoch%d.png' % epoch)
