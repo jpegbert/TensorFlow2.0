@@ -1,3 +1,5 @@
 # pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 tensorflow==2.0.2
+pandas==1.1.2
+seaborn==0.11.0
